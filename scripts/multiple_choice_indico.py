@@ -35,9 +35,11 @@ class AnswerIndico(ShortTextIndico):
 
 class QuestionIndico(ShortTextIndico):
 
-    def __init__(self, num, text, answer_a_text, answer_b_text, answer_c_text, answer_d_text):
-        super().__init__(text)
-        self.question_num = num
+    def __init__(self, _id, question, correct_answer, answer_a_text, answer_b_text, answer_c_text, answer_d_text):
+        super().__init__(question)
+        self.question = question
+        self.question_id = _id
+        self.correct_answer = correct_answer
         self.answer_a = AnswerIndico(answer_a_text)
         self.answer_b = AnswerIndico(answer_b_text)
         self.answer_c = AnswerIndico(answer_c_text)
@@ -51,7 +53,19 @@ class DataSet(object):
         self.read_data()
 
     def read_data(self):
-        1
+        questions_list = []
+
+        with open(data_path, 'r') as f:
+            lines = f.readlines()
+
+            for line in lines[1:]:
+                q = line.split('\t')
+                try: 
+                    questions_list.append(QuestionIndico(q[0], q[1], q[2], q[3], q[4], q[5], q[6]))
+                except:
+                    print "ERROR: ", repr(q)
+
+        self.questions_list = questions_list
 
 
 
