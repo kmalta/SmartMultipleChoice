@@ -9,9 +9,21 @@ top 3 leaderboard results, so this isn't unreasonable.
 
 Web REST apis:
 
-NOTE: ALCHEMY API ISN'T WORKING RIGHT NOW.  THEY CLAIM MY API KEY IS INVALID
+1. indico.io
 
-1. www.alchemyapi.com
+    Documentation: https://indico.io/docs
+
+    Installation: 
+
+    $ `pip install requests`     #requests >= 1.2.3
+    $ `pip install six`          #six >= 1.3.0
+    $ `pip install pillow`       #pillow >= 2.8.1
+    $ `pip install indicoio`
+
+
+2. www.alchemyapi.com
+
+NOTE: ALCHEMY API ISN'T WORKING RIGHT NOW.  THEY CLAIM MY API KEY IS INVALID
 
     Documentation: http://www.alchemyapi.com/api
 
@@ -54,16 +66,6 @@ NOTE: ALCHEMY API ISN'T WORKING RIGHT NOW.  THEY CLAIM MY API KEY IS INVALID
         response = alchemyapi.sentiment("text", myText)
         print "Sentiment: ", response["docSentiment"]["type"]
 
-2. indico.io
-
-    Documentation: https://indico.io/docs
-
-    Installation: 
-
-    $ `pip install requests`     #requests >= 1.2.3
-    $ `pip install six`          #six >= 1.3.0
-    $ `pip install pillow`       #pillow >= 2.8.1
-    $ `pip install indicoio`
 
 
 
