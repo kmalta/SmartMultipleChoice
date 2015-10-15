@@ -13,6 +13,8 @@ Web REST apis:
 
     Documentation: https://indico.io/docs
 
+    Request Limit: 50k per month
+
     Installation: 
 
         #requests >= 1.2.3
@@ -32,6 +34,8 @@ Web REST apis:
     NOTE: ALCHEMY API ISN'T WORKING RIGHT NOW.  THEY CLAIM MY API KEY IS INVALID
 
     Documentation: http://www.alchemyapi.com/api
+
+    Request Limit: 1k per day
 
     Installation:
 
@@ -82,7 +86,8 @@ Gensim's python package of Word2Vec:
     Installation:
 
     Note, this may require dependencies that I am not aware of since
-    I may have had them already downloaded.
+    I may have had them already downloaded.  This may include the package numpy.
+
 
     $ `pip install gensim`
 

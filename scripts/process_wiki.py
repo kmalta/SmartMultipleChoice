@@ -18,9 +18,10 @@ space = " "
 i = 0
 
 output = open('../models/wiki.en.text', 'w')
-wiki = WikiCorpus('../../enwiki-20100622-pages-articles.xml.bz2',  lemmatize=False)
+wiki = WikiCorpus('../../data_set/enwiki-20100622-pages-articles.xml.bz2',  lemmatize=False)
 
-# print wiki
+print wiki
+
 # for text in wiki.get_texts():
 #     output.write(space.join(text) + "\n")
 #     i = i + 1

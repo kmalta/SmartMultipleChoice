@@ -16,7 +16,7 @@ def load_corpus():
 def train_model():
     corpus = create_corpus()
     model = word2vec.Word2Vec(corpus, workers=4,
-                size=300, min_count = 5,
+                size=500, min_count = 5,
                 window = 50, sample = 1e-5)
 
     model.init_sims(replace=True)
