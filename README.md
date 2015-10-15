@@ -35,42 +35,42 @@ Web REST apis:
 
     Installation:
 
-    $ `pip install requests`
+        $ `pip install requests`
 
 
-    ########## MAKE SURE THE NEXT COMMANDS ARE NOT IN OUR REPO FOLDER! ########
-    ######################## PUT IT ONE DIRECTORY UP!! ########################
+        ########## MAKE SURE THE NEXT COMMANDS ARE NOT IN OUR REPO FOLDER! ########
+        ######################## PUT IT ONE DIRECTORY UP!! ########################
 
-    If you prefer to place the files elsewhere, you must add your path to your header
-    in your Python files:
+        If you prefer to place the files elsewhere, you must add your path to your header
+        in your Python files:
 
-    import sys
-    sys.path.append('FILL_IN_PATH_HERE/alchemyapi_python')
+        import sys
+        sys.path.append('FILL_IN_PATH_HERE/alchemyapi_python')
 
 
-    $ `git clone https://github.com/AlchemyAPI/alchemyapi_python.git`
-    $ `cd alchemyapi_python/`
+        $ `git clone https://github.com/AlchemyAPI/alchemyapi_python.git`
+        $ `cd alchemyapi_python/`
 
-    # Fill in our API_KEY from the secrets file
-    $ `python alchemyapi.py OUR_API_KEY`
+        # Fill in our API_KEY from the secrets file
+        $ `python alchemyapi.py OUR_API_KEY`
 
-    If this gives you an error, I recommend updating your python version.  I had 
-    the problem where pip install verified installation of requests but I was unable
-    to import the module.  EZ update fix.
+        If this gives you an error, I recommend updating your python version.  I had 
+        the problem where pip install verified installation of requests but I was unable
+        to import the module.  EZ update fix.
 
-    Now at the top of each python document that you will add the following:
+        Now at the top of each python document that you will add the following:
 
-        "from ../alchemyapi import AlchemyAPI"
+            "from ../alchemyapi import AlchemyAPI"
 
-    Instantiating an object is as simple as:
+        Instantiating an object is as simple as:
 
-        "alchemyapi = AlchemyAPI()"
+            "alchemyapi = AlchemyAPI()"
 
-    Example:
+        Example:
 
-        myText = "I'm excited to get started with AlchemyAPI!"
-        response = alchemyapi.sentiment("text", myText)
-        print "Sentiment: ", response["docSentiment"]["type"]
+            myText = "I'm excited to get started with AlchemyAPI!"
+            response = alchemyapi.sentiment("text", myText)
+            print "Sentiment: ", response["docSentiment"]["type"]
 
 
 
