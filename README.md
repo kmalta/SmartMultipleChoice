@@ -15,15 +15,21 @@ Web REST apis:
 
     Installation: 
 
-    $ `pip install requests`     #requests >= 1.2.3
-    $ `pip install six`          #six >= 1.3.0
-    $ `pip install pillow`       #pillow >= 2.8.1
-    $ `pip install indicoio`
+        #requests >= 1.2.3
+        $ `pip install requests`
+
+        #six >= 1.3.0
+        $ `pip install six`
+
+        #pillow >= 2.8.1
+        $ `pip install pillow`
+
+        $ `pip install indicoio`
 
 
 2. www.alchemyapi.com
 
-NOTE: ALCHEMY API ISN'T WORKING RIGHT NOW.  THEY CLAIM MY API KEY IS INVALID
+    NOTE: ALCHEMY API ISN'T WORKING RIGHT NOW.  THEY CLAIM MY API KEY IS INVALID
 
     Documentation: http://www.alchemyapi.com/api
 
