@@ -6,6 +6,7 @@ import indicoio
 
 import shelve
 
+import dill as pickle
 
 indicoio.config.api_key = INDICO_API_KEY
 
@@ -29,6 +30,12 @@ def modify_shelf(key, value):
   d[key].modified = value
   d.close()
 
+def pickle_obj(obj):
+  f = open('saved.p', 'wb')
+  pickle.dump(obj, f)
+
+pickle_obj(test_batch_tags())
+
 #add_to_shelf('sentiments', test_batch_tags())
 
-modify_shelf('sentiments', 'Hi Brandon!')
+#modify_shelf('sentiments', 'Hi Brandon!')
