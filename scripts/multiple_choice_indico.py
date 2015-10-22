@@ -4,6 +4,7 @@ sys.path.append('./')
 from secrets import *
 import word2vec_model_setup
 from indicoio import config, named_entities, keywords, text_tags
+import dill as pickle
 
 config.api_key = INDICO_API_KEY
 
@@ -75,14 +76,14 @@ class DataSet(object):
 
     def save_object(self):
         f = open('../models/' + self.save_name, 'w')
-        cPickle.dump(model, f, cPickle.HIGHEST_PROTOCOL)
+        pickle.dump(model, f, pickle.HIGHEST_PROTOCOL)
         f.close()
 
 
 #TEST FOR READING DATA
 
 data = DataSet('../../data_set/training_set.tsv', 'smarter_tha_8th_grader_training_set_data_classes.pickle')
-data.save_object
+data.save_object()
 
 for question in data.questions_list:
     print "#################################################"
