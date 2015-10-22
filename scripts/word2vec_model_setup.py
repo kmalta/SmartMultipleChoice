@@ -2,7 +2,7 @@ from gensim.models import Word2Vec
 from gensim.corpora import WikiCorpus
 from gensim.models.word2vec import LineSentence
 import numpy as np
-import cPickle
+import dill as pickle
 import logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
@@ -15,8 +15,8 @@ def load_corpus():
 
 def train_model():
     corpus = load_corpus()
-    model = word2vec.Word2Vec(corpus, workers=4,
-                size=500, min_count = 5,
+    model = word2vec.Word2Vec(corpus, workers = 4,
+                size = 500, min_count = 5,
                 window = 50, sample = 1e-5)
 
     model.init_sims(replace=True)
@@ -27,4 +27,4 @@ def save_model(model):
 
 #RUNS THE MODEL TRAINING
 #WARNING: THIS SHIT WILL TAKE FOREVER
-train_model()
+#train_model()
