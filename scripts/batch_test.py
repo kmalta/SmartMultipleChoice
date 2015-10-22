@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+sys.path.append('./')
 from secrets import *
 import indicoio
 
@@ -21,4 +24,11 @@ def add_to_shelf(key, value):
   d[key] = value
   d.close()
 
-add_to_shelf('sentiments', test_batch_tags())
+def modify_shelf(key, value):
+  d = shelve.open('shelf_location')
+  d[key].modified = value
+  d.close()
+
+#add_to_shelf('sentiments', test_batch_tags())
+
+modify_shelf('sentiments', 'Hi Brandon!')
