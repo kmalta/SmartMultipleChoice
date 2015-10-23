@@ -2,7 +2,6 @@ import sys
 sys.path.append('../')
 sys.path.append('./')
 from secrets import *
-import word2vec_model_setup
 from indicoio import config, named_entities, keywords, text_tags
 import dill as pickle
 
@@ -50,7 +49,6 @@ class DataSet(object):
     def __init__(self, data_path, save_name):
         self.data_path = data_path
         self.save_name = save_name
-        #self.model = Word2Vec.load('../models/word2vec_model')
         self.read_data()
 
     def read_data(self):
@@ -63,10 +61,10 @@ class DataSet(object):
             idx = 0
             for line in lines[1:]:
                 idx += 1
-                if idx % 100 == 0:
+                if idx % 10 == 0:
                     print "Processing:", idx, "out of", length
                 q = line.split('\t')
-                try: 
+                try:
                     questions_list.append(QuestionIndico(q[0], q[1], q[2], q[3], q[4], q[5], q[6]))
                 except:
                     print "ERROR reading question:", repr(q)
@@ -75,7 +73,7 @@ class DataSet(object):
         self.questions_list = questions_list
 
     def save_object(self):
-        f = open('../models/' + self.save_name, 'w')
+        f = open('../sharedObjects/' + self.save_name, 'w')
         pickle.dump(model, f, pickle.HIGHEST_PROTOCOL)
         f.close()
 
