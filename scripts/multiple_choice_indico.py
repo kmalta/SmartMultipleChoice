@@ -46,9 +46,8 @@ class QuestionIndico(ShortTextIndico):
 
 class DataSet(object):
 
-    def __init__(self, data_path, save_name):
+    def __init__(self, data_path):
         self.data_path = data_path
-        self.save_name = save_name
         self.read_data()
 
     def read_data(self):
@@ -72,16 +71,17 @@ class DataSet(object):
         f.close()
         self.questions_list = questions_list
 
-    def save_object(self):
-        f = open('../sharedObjects/' + self.save_name, 'w')
-        pickle.dump(model, f, pickle.HIGHEST_PROTOCOL)
-        f.close()
+
+def save_object(obj, name):
+    f = open('../sharedObjects/' + name, 'w')
+    pickle.dump(obj, f)
+    f.close()
 
 
 #TEST FOR READING DATA
 
-data = DataSet('../../data_set/training_set.tsv', 'smarter_tha_8th_grader_training_set_data_classes.pickle')
-data.save_object()
+data = DataSet('../../data_set/training_set.tsv')
+save_object(data, 'smarter_tha_8th_grader_training_set_data_classes.p')
 
 for question in data.questions_list:
     print "#################################################"
