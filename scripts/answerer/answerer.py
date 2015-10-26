@@ -32,16 +32,8 @@ class NaiveStrategy(AnswerStrategy):
 
   def answer(self, mc):
     q_sum = self.__tokenize_and_add(mc.question)
-    a_sum = self.__tokenize_and_add(mc.answerA)
-    b_sum = self.__tokenize_and_add(mc.answerB)
-    c_sum = self.__tokenize_and_add(mc.answerC)
-    d_sum = self.__tokenize_and_add(mc.answerD)
-    cos = np.array([
-      cosine(q_sum, a_sum),
-      cosine(q_sum, b_sum),
-      cosine(q_sum, c_sum),
-      cosine(q_sum, d_sum)
-    ])
+    options = [mc.answerA, mc.answerB, mc.answerC, mc.answerD]
+    cos = np.array([cosine(q_sum, self.__tokenize_and_add(x)) for x in options])
     return ['A', 'B', 'C', 'D'][cos.argmax()]
 
   def __tokenize_and_add(self, sentence):
