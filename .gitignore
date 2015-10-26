@@ -2,3 +2,5 @@ secrets.py
 api_key.txt
 *.pyc
 *.DS_store
+data/
+.idea

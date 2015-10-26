@@ -1,4 +1,7 @@
 import csv
+import gensim
+from scipy.spatial.distance import cosine
+import numpy as np
 
 class MultipleChoiceQuestion(object):
   
@@ -22,11 +25,33 @@ class AnswerStrategy(object):
 class NaiveStrategy(AnswerStrategy):
 
   def __init__(self):
-    pass
-  
+    print "Loading model..."
+    self.model = gensim.models.Word2Vec.load_word2vec_format("data/glove.6B.50d.txt")
+    print "Done!"
+
   def answer(self, mc):
-    """TODO: Implement this"""
-    return ('A', mc.answerA)
+    q_sum = self.__tokenize_and_add(mc.question)
+    a_sum = self.__tokenize_and_add(mc.answerA)
+    b_sum = self.__tokenize_and_add(mc.answerB)
+    c_sum = self.__tokenize_and_add(mc.answerC)
+    d_sum = self.__tokenize_and_add(mc.answerD)
+    cos = np.array([
+      cosine(q_sum, a_sum),
+      cosine(q_sum, b_sum),
+      cosine(q_sum, c_sum),
+      cosine(q_sum, d_sum)
+    ])
+    return ['A', 'B', 'C', 'D'][cos.argmax()]
+
+  def __tokenize_and_add(self, sentence):
+    sentence_sum = 0
+    for s in gensim.utils.tokenize(sentence):
+      try:
+        v = self.model[s.lower()]
+        sentence_sum += v
+      except:
+        pass
+    return sentence_sum
 
 class Answerer(object):
   
