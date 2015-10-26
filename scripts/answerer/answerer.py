@@ -27,7 +27,8 @@ class NaiveStrategy(AnswerStrategy):
   def __init__(self):
     print "Initializing strategy..."
     self.model = gensim.models.Word2Vec.load_word2vec_format("data/glove.6B.50d.txt")
-    self.stop_list = set('for a of the and to in'.split())
+    # Stop list is the top 14 most frequent words from training_set.tsv
+    self.stop_list = set('the of a to in is and which that are an on from'.split())
     print "Done!"
 
   def answer(self, mc):
