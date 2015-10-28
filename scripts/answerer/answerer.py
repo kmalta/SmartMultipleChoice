@@ -1,74 +1,101 @@
-import csv
 import gensim
 from scipy.spatial.distance import cosine
 import numpy as np
-
-class MultipleChoiceQuestion(object):
-  
-  def __init__(self, init_values):
-    self.id = init_values['id']
-    self.correctAnswer = init_values['correctAnswer']
-    self.question = init_values['question']
-    self.answerA = init_values['answerA']
-    self.answerB = init_values['answerB']
-    self.answerC = init_values['answerC']
-    self.answerD = init_values['answerD']
+import random
 
 class AnswerStrategy(object):
 
-  def __init__(self):
+  def __init__(self, data_set_obj, model):
+    self.data_set_obj = data_set_obj
+    self.model = model
+
+
+  def answer(self, question_class):
     pass
 
-  def answer(self, mc):
-    pass
+  def run(self):
+    # TODO: Data here is a Pandas dataframe. Need to change this to a list of MultipleChoiceQuestion class
+    predictions = []
+    for question in self.data_set_obj.questions_list:
+      predictions += [ self.answer(question) == question.correct_answer ]
+    accuracy = np.mean(predictions)
+    return accuracy
+
+
+
+class BaselineStrategy(AnswerStrategy):
+
+  def __init__(self, data_set_obj, model, letter):
+    AnswerStrategy.__init__(self, data_set_obj, model)
+    self.auto_answer = letter
+
+  def answer(self, question_class):
+    return self.auto_answer
+
+class BaselineRandomStrategy(AnswerStrategy):
+
+  def __init__(self, data_set_obj, model):
+    AnswerStrategy.__init__(self, data_set_obj, model)
+
+  def answer(self, question_class):
+    return ['A', 'B', 'C', 'D'][random.randrange(0,3,1)]
+
 
 class NaiveStrategy(AnswerStrategy):
 
-  def __init__(self):
-    print "Initializing strategy..."
-    self.model = gensim.models.Word2Vec.load_word2vec_format("data/glove.6B.50d.txt")
+  def __init__(self, data_set_obj, model):
+    AnswerStrategy.__init__(self, data_set_obj, model)
     # Stop list is the top 14 most frequent words from training_set.tsv
     self.stop_list = set('the of a to in is and which that are an on from'.split())
-    print "Done!"
 
-  def answer(self, mc):
-    q_sum = self.__tokenize_and_add(mc.question)
-    options = [mc.answerA, mc.answerB, mc.answerC, mc.answerD]
-    cos = np.array([cosine(q_sum, self.__tokenize_and_add(x)) for x in options])
+  def answer(self, question_class):
+    q_vec = self.__tokenize_and_add(question_class.question)
+    options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
+    cos = np.array([cosine(q_vec, self.__tokenize_and_add(x.text)) for x in options])
     return ['A', 'B', 'C', 'D'][cos.argmax()]
 
-  def __tokenize_and_add(self, sentence):
-    sentence_sum = np.zeros(self.model.vector_size)
-    for s in gensim.utils.tokenize(sentence):
+  def __tokenize_and_add(self, text):
+    text_vec_sum = np.zeros(self.model.vector_size)
+    for s in gensim.utils.tokenize(text):
       try:
         if s not in self.stop_list:
-          v = self.model[s.lower()]
-          sentence_sum += v
+          vec = self.model[s.lower()]
+          text_vec_sum += vec
       except:
         pass
-    return sentence_sum
+    return text_vec_sum
 
-  def test(self, data):
-    # TODO: Data here is a Pandas dataframe. Need to change this to a list of MultipleChoiceQuestion class
-    print "Testing data..."
-    predictions = []
-    for row in xrange(data.shape[0]):
-      mc = MultipleChoiceQuestion(data.loc[row, :])
-      predictions += [a.answer(mc) == data.loc[row, 'correctAnswer']]
-    accuracy = np.mean(predictions)
-    print "Done!"
-    return accuracy
+class KeywordEqualWeightStrategy(AnswerStrategy):
+
+  def __init__(self, data_set_obj, model):
+    AnswerStrategy.__init__(self, data_set_obj, model)
+
+  def answer(self, question_class):
+    q_vec = self.__keyword_sum(question_class.question, question_class.keywords)
+    options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
+    cos = np.array([cosine(q_vec, self.__keyword_sum(x.text, x.keywords)) for x in options])
+    return ['A', 'B', 'C', 'D'][cos.argmax()]
+
+  def __keyword_sum(self, text, keyword_dict):
+    short_text_summary = np.zeros(self.model.vector_size)
+    keywords = keyword_dict.keys()
+    for key in keywords:
+      try:
+        vec = self.model[key.lower()]
+        short_text_summary += vec
+      except:
+        pass
+    return short_text_summary
+
 
 class KeywordConfidenceStrategy(AnswerStrategy):
 
-  def __init__(self):
-    print "Initializing keyword confidence strategy..."
-    self.model = gensim.models.Word2Vec.load_word2vec_format("data/glove.6B.50d.txt")
-    # Stop list is the top 14 most frequent words from training_set.tsv
+  def __init__(self, data_set_obj, model):
+    AnswerStrategy.__init__(self, data_set_obj, model)
 
-  def answer(self, mc):
-    q_vec = self.__keyword_linear_combination(mc.question, mc.keywords)
-    options = [mc.answer_a, mc.answer_b, mc.answer_c, mc.answer_d]
+  def answer(self, question_class):
+    q_vec = self.__keyword_linear_combination(question_class.question, question_class.keywords)
+    options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.__keyword_linear_combination(x.text, x.keywords)) for x in options])
     return ['A', 'B', 'C', 'D'][cos.argmax()]
 
@@ -77,35 +104,81 @@ class KeywordConfidenceStrategy(AnswerStrategy):
     keywords = keyword_dict.keys()
     for key in keywords:
       try:
-          v = self.model[key.lower()]
-          short_text_summary += 100*keyword_dict[key]*v
+        vec = self.model[key.lower()]
+        short_text_summary += 100*keyword_dict[key]*vec
       except:
         pass
     return short_text_summary
 
-  def run(self, data_set_obj):
-    # TODO: Data here is a Pandas dataframe. Need to change this to a list of MultipleChoiceQuestion class
-    print "Running data..."
-    predictions = []
-    for question in data_set_obj.questions_list:
-      predictions += [ self.answer(question) == question.correct_answer ]
-    accuracy = np.mean(predictions)
-    print "Done!"
-    return accuracy
+class TopicWeightedKeywordSumStrategy(AnswerStrategy):
 
+  def __init__(self, data_set_obj, model):
+    AnswerStrategy.__init__(self, data_set_obj, model)
 
+  def answer(self, question_class):
+    q_vec = self.__topic_keyword_linear_combination(question_class.question, question_class.keywords, question_class.text_tags)
+    options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
+    cos = np.array([cosine(q_vec, self.__topic_keyword_linear_combination(x.text, x.keywords, x.text_tags)) for x in options])
+    return ['A', 'B', 'C', 'D'][cos.argmax()]
 
-class Answerer(object):
-  
-  def __init__(self, strategy):
-    self._strategy = strategy
+  def __topic_keyword_linear_combination(self, text, keyword_dict, text_tags):
+    short_text_summary = np.zeros(self.model.vector_size)
+    keywords = keyword_dict.keys()
+    for key in keywords:
+      try:
+        vec = self.model[key.lower()]
+        short_text_summary += vec
+      except:
+        pass
 
-  def answer(self, mc):
-    return self._strategy.answer(mc)
+    tags = map(lambda x: (x, text_tags[x]), text_tags.keys())
+    tags_sort = sorted(tags, reverse=True, key=lambda x: x[1])
 
-  def test(self, data):
-    return self._strategy.test(data)
+    for tag_tup in tags_sort:
+      try:
+        vec = self.model[tag_tup[0].lower()]
+        short_text_summary += 100*tag_tup[1]*vec
+      except:
+        pass
+
+    return short_text_summary
+
+class TopicWeightedNaiveSumStrategy(AnswerStrategy):
+
+  def __init__(self, data_set_obj, model):
+    AnswerStrategy.__init__(self, data_set_obj, model)
+    # Stop list is the top 14 most frequent words from training_set.tsv
+    self.stop_list = set('the of a to in is and which that are an on from'.split())
+
+  def answer(self, question_class):
+    q_vec = self.__topic_linear_combination(question_class.question, question_class.text_tags)
+    options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
+    cos = np.array([cosine(q_vec, self.__topic_linear_combination(x.text, x.text_tags)) for x in options])
+    return ['A', 'B', 'C', 'D'][cos.argmax()]
+
+  def __topic_linear_combination(self, text, text_tags):
+    text_vec_sum = np.zeros(self.model.vector_size)
+    for s in gensim.utils.tokenize(text):
+      try:
+        if s not in self.stop_list:
+          vec = self.model[s.lower()]
+          text_vec_sum += vec
+      except:
+        pass
+
+    tags = map(lambda x: (x, text_tags[x]), text_tags.keys())
+    tags_sort = sorted(tags, reverse=True, key=lambda x: x[1])
+
+    for tag_tup in tags_sort:
+      try:
+        vec = self.model[tag_tup[0].lower()]
+        text_vec_sum += 100*tag_tup[1]*vec
+      except:
+        pass
+
+    return text_vec_sum
+
 
 if __name__ == '__main__':
   pass
-  
+
