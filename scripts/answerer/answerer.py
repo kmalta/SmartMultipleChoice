@@ -83,13 +83,12 @@ class KeywordConfidenceStrategy(AnswerStrategy):
         pass
     return short_text_summary
 
-  def test(self, data):
+  def run(self, data_set_obj):
     # TODO: Data here is a Pandas dataframe. Need to change this to a list of MultipleChoiceQuestion class
-    print "Testing data..."
+    print "Running data..."
     predictions = []
-    for row in xrange(data.shape[0]):
-      mc = MultipleChoiceQuestion(data.loc[row, :])
-      predictions += [a.answer(mc) == data.loc[row, 'correctAnswer']]
+    for question in data_set_obj.questions_list:
+      predictions += [ self.answer(question) == question.correct_answer ]
     accuracy = np.mean(predictions)
     print "Done!"
     return accuracy
