@@ -59,6 +59,42 @@ class NaiveStrategy(AnswerStrategy):
     print "Done!"
     return accuracy
 
+class KeywordConfidenceStrategy(AnswerStrategy):
+
+  def __init__(self):
+    print "Initializing keyword confidence strategy..."
+    self.model = gensim.models.Word2Vec.load_word2vec_format("data/glove.6B.50d.txt")
+    # Stop list is the top 14 most frequent words from training_set.tsv
+
+  def answer(self, mc):
+    q_vec = self.__keyword_linear_combination(mc.question, mc.keywords)
+    options = [mc.answer_a, mc.answer_b, mc.answer_c, mc.answer_d]
+    cos = np.array([cosine(q_vec, self.__keyword_linear_combination(x.text, x.keywords)) for x in options])
+    return ['A', 'B', 'C', 'D'][cos.argmax()]
+
+  def __keyword_linear_combination(self, text, keyword_dict):
+    short_text_summary = np.zeros(self.model.vector_size)
+    keywords = keyword_dict.keys()
+    for key in keywords:
+      try:
+          v = self.model[key.lower()]
+          short_text_summary += 100*keyword_dict[key]*v
+      except:
+        pass
+    return short_text_summary
+
+  def test(self, data):
+    # TODO: Data here is a Pandas dataframe. Need to change this to a list of MultipleChoiceQuestion class
+    print "Testing data..."
+    predictions = []
+    for row in xrange(data.shape[0]):
+      mc = MultipleChoiceQuestion(data.loc[row, :])
+      predictions += [a.answer(mc) == data.loc[row, 'correctAnswer']]
+    accuracy = np.mean(predictions)
+    print "Done!"
+    return accuracy
+
+
 
 class Answerer(object):
   
