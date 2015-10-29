@@ -5,7 +5,7 @@ import gensim
 
 import dill as pickle
 
-DATA_SET_PICKLE_FILE = '../sharedObjects/smarter_tha_8th_grader_training_set_data_classes.p'
+DATA_SET_PICKLE_FILE = '../sharedObjects/smarter_tha_8th_grader_training_set_data_classes_10_29_15.p'
 
 def main(argv):
   f = open(DATA_SET_PICKLE_FILE, 'r')
@@ -36,7 +36,7 @@ def main(argv):
   print "Baseline D Strategy:", str(baselineD.run())
   print "Baseline Random Strategy:", str(baselineRand.run())
   print "Naive Strategy:", str(naive.run())
-  print "Keyword Equal Strtegy:", str(keywordsEqual.run())
+  print "Keyword Equal Strategy:", str(keywordsEqual.run())
   print "Keyword Confidence Strategy:", str(keywordsConfidence.run())
   print "Topic Weight Keyword Strategy:", str(topicKeywordSum.run())
   print "Topic Weight Naive Strategy:", str(topicNaiveSum.run())
