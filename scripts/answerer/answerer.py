@@ -74,15 +74,34 @@ class KeywordEqualWeightStrategy(AnswerStrategy):
     q_vec = self.__keyword_sum(question_class.question, question_class.keywords)
     options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.__keyword_sum(x.text, x.keywords)) for x in options])
-    return ['A', 'B', 'C', 'D'][cos.argmax()]
+    predicted_answer = ['A', 'B', 'C', 'D'][cos.argmax()]
+
+    # print "################################################################"
+    # print "################################################################"
+    # print "\n"
+
+    # print "CORRECT ANSWER vs INCORRECT:", question_class.correct_answer, predicted_answer
+    # print "\n"
+    # print "\t\tQuestion:", question_class.question
+    # print "\t\t\tKeywords:", question_class.keywords
+    # correct = options[['A', 'B', 'C', 'D'].index(question_class.correct_answer)]
+    # print "\t\tCorrect Answer:", correct.text
+    # print "\t\t\tKeywords:", correct.keywords
+    # if question_class.correct_answer != predicted_answer:
+    #   incorrect = options[['A', 'B', 'C', 'D'].index(predicted_answer)]
+    #   print "\t\tIncorrect Answer:", incorrect.text
+    #   print "\t\t\tKeywords:", incorrect.keywords
+
+    return predicted_answer
 
   def __keyword_sum(self, text, keyword_dict):
     short_text_summary = np.zeros(self.model.vector_size)
     keywords = keyword_dict.keys()
     for key in keywords:
       try:
-        vec = self.model[key.lower()]
-        short_text_summary += vec
+        if keyword_dict[key] > 0.05:
+          vec = self.model[key.lower()]
+          short_text_summary += vec
       except:
         pass
     return short_text_summary
@@ -104,8 +123,9 @@ class KeywordConfidenceStrategy(AnswerStrategy):
     keywords = keyword_dict.keys()
     for key in keywords:
       try:
-        vec = self.model[key.lower()]
-        short_text_summary += 100*keyword_dict[key]*vec
+        if keyword_dict[key] > 0.05:
+          vec = self.model[key.lower()]
+          short_text_summary += 100*keyword_dict[key]*vec
       except:
         pass
     return short_text_summary
@@ -126,8 +146,9 @@ class TopicWeightedKeywordSumStrategy(AnswerStrategy):
     keywords = keyword_dict.keys()
     for key in keywords:
       try:
-        vec = self.model[key.lower()]
-        short_text_summary += vec
+        if keyword_dict[key] > 0.05:
+          vec = self.model[key.lower()]
+          short_text_summary += vec
       except:
         pass
 

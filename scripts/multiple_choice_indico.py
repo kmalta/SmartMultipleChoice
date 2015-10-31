@@ -13,13 +13,19 @@ class ShortTextIndico(object):
         self.text = text
         self.entity_extraction(text)
         self.keywords_extraction(text)
+        #self.keywords_extraction_relative(text)
         self.text_tags_extraction(text)
 
     def entity_extraction(self, text):
-        self.named_entities = named_entities(text)
+        self.named_entities = named_entities(text, threshold=0)
 
     def keywords_extraction(self, text):
-        self.keywords = keywords(text)
+        length = len(text.split())
+        self.keywords = keywords(text, top_n=length, threshold=0)
+
+    def keywords_extraction_relative(self, text):
+        length = len(text.split())
+        self.keywords_relative = keywords(text, top_n=length, threshold=0, relative=True)
 
     def text_tags_extraction(self, text):
         self.text_tags = text_tags(text)
@@ -80,22 +86,22 @@ def save_object(obj, name):
 
 #TEST FOR READING DATA
 
-data = DataSet('../../data_set/training_set.tsv')
-save_object(data, 'smarter_tha_8th_grader_training_set_data_classes.p')
+# data = DataSet('../../data_set/training_set.tsv')
+# save_object(data, 'smarter_tha_8th_grader_training_set_data_classes_11_1_15.p')
 
-for question in data.questions_list:
-    print "#################################################"
-    print "#################################################"
-    print "\n"
-    print "Question ID:", question._id
-    print "\n"
-    print "Quesion:", question.question
-    print "\n"
-    print "Answer A:", question.answer_a
-    print "Answer B:", question.answer_b
-    print "Answer C:", question.answer_c
-    print "Answer D:", question.answer_d
-    print "\n"
-    print "Correct Answer:", question.correct_answer
-    print "\n\n"
+# for question in data.questions_list:
+#     print "#################################################"
+#     print "#################################################"
+#     print "\n"
+#     print "Question ID:", question._id
+#     print "\n"
+#     print "Quesion:", question.question
+#     print "\n"
+#     print "Answer A:", question.answer_a
+#     print "Answer B:", question.answer_b
+#     print "Answer C:", question.answer_c
+#     print "Answer D:", question.answer_d
+#     print "\n"
+#     print "Correct Answer:", question.correct_answer
+#     print "\n\n"
 
