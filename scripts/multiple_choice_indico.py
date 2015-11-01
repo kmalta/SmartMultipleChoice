@@ -13,7 +13,6 @@ class ShortTextIndico(object):
         self.text = text
         self.entity_extraction(text)
         self.keywords_extraction(text)
-        #self.keywords_extraction_relative(text)
         self.text_tags_extraction(text)
 
     def entity_extraction(self, text):
@@ -49,6 +48,14 @@ class QuestionIndico(ShortTextIndico):
         self.answer_b = AnswerIndico(answer_b_text, 'B')
         self.answer_c = AnswerIndico(answer_c_text, 'C')
         self.answer_d = AnswerIndico(answer_d_text, 'D')
+
+        # ADDED QUESTION STATS:
+        # self.ave_keyword_confidence
+        # self.ratio_unrecognized_words
+        # self.fill_in_the_blank
+        # self.word_count
+        # self.contains_numbers
+        # self.type (question, statement, or answer_finisher)
 
 class DataSet(object):
 
