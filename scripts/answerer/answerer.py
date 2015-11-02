@@ -52,7 +52,7 @@ class NaiveStrategy(AnswerStrategy):
     q_vec = self.__tokenize_and_add(question_class.question)
     options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.__tokenize_and_add(x.text)) for x in options])
-    return ['A', 'B', 'C', 'D'][cos.argmax()]
+    return ['A', 'B', 'C', 'D'][cos.argmin()]
 
   def __tokenize_and_add(self, text):
     text_vec_sum = np.zeros(self.model.vector_size)
@@ -74,7 +74,7 @@ class KeywordEqualWeightStrategy(AnswerStrategy):
     q_vec = self.__keyword_sum(question_class.question, question_class.keywords)
     options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.__keyword_sum(x.text, x.keywords)) for x in options])
-    predicted_answer = ['A', 'B', 'C', 'D'][cos.argmax()]
+    predicted_answer = ['A', 'B', 'C', 'D'][cos.argmin()]
 
     # print "################################################################"
     # print "################################################################"
@@ -116,7 +116,7 @@ class KeywordConfidenceStrategy(AnswerStrategy):
     q_vec = self.__keyword_linear_combination(question_class.question, question_class.keywords)
     options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.__keyword_linear_combination(x.text, x.keywords)) for x in options])
-    return ['A', 'B', 'C', 'D'][cos.argmax()]
+    return ['A', 'B', 'C', 'D'][cos.argmin()]
 
   def __keyword_linear_combination(self, text, keyword_dict):
     short_text_summary = np.zeros(self.model.vector_size)
@@ -139,7 +139,7 @@ class TopicWeightedKeywordSumStrategy(AnswerStrategy):
     q_vec = self.__topic_keyword_linear_combination(question_class.question, question_class.keywords, question_class.text_tags)
     options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.__topic_keyword_linear_combination(x.text, x.keywords, x.text_tags)) for x in options])
-    return ['A', 'B', 'C', 'D'][cos.argmax()]
+    return ['A', 'B', 'C', 'D'][cos.argmin()]
 
   def __topic_keyword_linear_combination(self, text, keyword_dict, text_tags):
     short_text_summary = np.zeros(self.model.vector_size)
@@ -175,7 +175,7 @@ class TopicWeightedNaiveSumStrategy(AnswerStrategy):
     q_vec = self.__topic_linear_combination(question_class.question, question_class.text_tags)
     options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.__topic_linear_combination(x.text, x.text_tags)) for x in options])
-    return ['A', 'B', 'C', 'D'][cos.argmax()]
+    return ['A', 'B', 'C', 'D'][cos.argmin()]
 
   def __topic_linear_combination(self, text, text_tags):
     text_vec_sum = np.zeros(self.model.vector_size)
