@@ -2,6 +2,35 @@ __author__ = 'angad'
 
 import requests
 from bs4 import BeautifulSoup
+from gensim.utils import tokenize
+
+
+class Corpus(object):
+    def __init__(self):
+        self.subjects = []
+        self.subject_urls = ['http://www.ck12.org/earth-science/',
+                             'http://www.ck12.org/life-science/',
+                             'http://www.ck12.org/physical-science/',
+                             'http://www.ck12.org/biology/',
+                             'http://www.ck12.org/chemistry/',
+                             'http://www.ck12.org/physics/']
+        print "Fetching subjects..."
+        self.fetch_subjects()
+        print "Done!"
+
+    def fetch_subjects(self):
+        for s in self.subject_urls:
+            self.subjects += [Subject(s)]
+            break
+
+    def dump_paragraphs(self, filename):
+        with open(filename, 'w') as f:
+            for s in self.subjects:
+                for c in s.concepts:
+                    for l in c.lessons:
+                        for s in l.paragraphs:
+                            f.write(s+'\n')
+
 
 
 class Subject(object):
@@ -18,7 +47,7 @@ class Subject(object):
         for x in soup.find_all('li', {'class': 'concepts'}):
             concept_url = x.a.get('href')
             self.concepts += [Concept(concept_url)]
-            # break
+            break
 
 
 class Concept(object):
@@ -48,11 +77,25 @@ class Lesson(object):
         self.url = url
         self.json = json
         self.content = []
+        self.paragraphs = []
+        self.paragraph_parse_tags = ['p', 'ol', 'ul']
         print "Fetching content " + self.url + " ..."
         self.fetch_content()
+        print "Done!"
+        print "Parsing paragraphs for " + self.url + "..."
+        self.parse_paragraphs()
         print "Done!"
 
     def fetch_content(self):
         r = requests.get(self.url)
         soup = BeautifulSoup(r.text, 'html.parser')
         self.content = soup
+
+    def parse_paragraphs(self):
+        for tag in self.paragraph_parse_tags:
+            for element in self.content.find_all(tag):
+                text = element.get_text(' ', strip=True).encode('ascii', "ignore")
+                # TODO: remove hyperlinks
+                text = " ".join(tokenize(text, lowercase=True))
+                if text != '':
+                    self.paragraphs += [text]
