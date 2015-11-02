@@ -54,6 +54,17 @@ class NaiveStrategy(AnswerStrategy):
     cos = np.array([cosine(q_vec, self.__tokenize_and_add(x.text)) for x in options])
     return ['A', 'B', 'C', 'D'][cos.argmin()]
 
+  def __tokenize_and_add(self, text):
+    text_vec_sum = np.zeros(self.model.vector_size)
+    for s in gensim.utils.tokenize(text):
+      try:
+        if s not in self.stop_list:
+          vec = self.model[s.lower()]
+          text_vec_sum += vec
+      except:
+        pass
+    return text_vec_sum
+
 
 class Doc2VecStrategy(AnswerStrategy):
 
