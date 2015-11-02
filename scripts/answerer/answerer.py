@@ -54,16 +54,23 @@ class NaiveStrategy(AnswerStrategy):
     cos = np.array([cosine(q_vec, self.__tokenize_and_add(x.text)) for x in options])
     return ['A', 'B', 'C', 'D'][cos.argmin()]
 
-  def __tokenize_and_add(self, text):
-    text_vec_sum = np.zeros(self.model.vector_size)
-    for s in gensim.utils.tokenize(text):
-      try:
-        if s not in self.stop_list:
-          vec = self.model[s.lower()]
-          text_vec_sum += vec
-      except:
-        pass
-    return text_vec_sum
+
+class Doc2VecStrategy(AnswerStrategy):
+
+  def __init__(self, data_set_obj, model):
+    AnswerStrategy.__init__(self, data_set_obj, model)
+    # Stop list is the top 14 most frequent words from training_set.tsv
+    # self.stop_list = set('the of a to in is and which that are an on from'.split())
+
+  def answer(self, question_class):
+    q_vec = self.model.infer_vector(self._tokenize(question_class.question))
+    options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
+    cos = np.array([cosine(q_vec, self.model.infer_vector(self._tokenize(x.text))) for x in options])
+    return ['A', 'B', 'C', 'D'][cos.argmin()]
+
+  def _tokenize(self, text):
+    return " ".join(gensim.utils.tokenize(text, lower=True))
+
 
 class KeywordEqualWeightStrategy(AnswerStrategy):
 
