@@ -21,7 +21,7 @@ class Corpus(object):
     def fetch_subjects(self):
         for s in self.subject_urls:
             self.subjects += [Subject(s)]
-            break
+            # break
 
     def dump_paragraphs(self, filename):
         with open(filename, 'w') as f:
@@ -47,7 +47,7 @@ class Subject(object):
         for x in soup.find_all('li', {'class': 'concepts'}):
             concept_url = x.a.get('href')
             self.concepts += [Concept(concept_url)]
-            break
+            # break
 
 
 class Concept(object):
