@@ -70,8 +70,6 @@ class Doc2VecStrategy(AnswerStrategy):
 
   def __init__(self, data_set_obj, model):
     AnswerStrategy.__init__(self, data_set_obj, model)
-    # Stop list is the top 14 most frequent words from training_set.tsv
-    # self.stop_list = set('the of a to in is and which that are an on from'.split())
 
   def answer(self, question_class):
     q_vec = self.model.infer_vector(self._tokenize(question_class.question))
@@ -93,22 +91,6 @@ class KeywordEqualWeightStrategy(AnswerStrategy):
     options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.__keyword_sum(x.text, x.keywords)) for x in options])
     predicted_answer = ['A', 'B', 'C', 'D'][cos.argmin()]
-
-    # print "################################################################"
-    # print "################################################################"
-    # print "\n"
-
-    # print "CORRECT ANSWER vs INCORRECT:", question_class.correct_answer, predicted_answer
-    # print "\n"
-    # print "\t\tQuestion:", question_class.question
-    # print "\t\t\tKeywords:", question_class.keywords
-    # correct = options[['A', 'B', 'C', 'D'].index(question_class.correct_answer)]
-    # print "\t\tCorrect Answer:", correct.text
-    # print "\t\t\tKeywords:", correct.keywords
-    # if question_class.correct_answer != predicted_answer:
-    #   incorrect = options[['A', 'B', 'C', 'D'].index(predicted_answer)]
-    #   print "\t\tIncorrect Answer:", incorrect.text
-    #   print "\t\t\tKeywords:", incorrect.keywords
 
     return predicted_answer
 
