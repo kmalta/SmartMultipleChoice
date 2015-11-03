@@ -1,11 +1,11 @@
 import sys
 sys.path.append('../')
 sys.path.append('./')
-from secrets import *
+# from secrets import *
 from indicoio import config, named_entities, keywords, text_tags
 import dill as pickle
 
-config.api_key = INDICO_API_KEY
+# config.api_key = INDICO_API_KEY
 
 class ShortTextIndico(object):
 

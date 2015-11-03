@@ -3,8 +3,13 @@ from answerer import BaselineStrategy, BaselineRandomStrategy, NaiveStrategy, Ke
 from answerer import KeywordConfidenceStrategy, TopicWeightedKeywordSumStrategy, TopicWeightedNaiveSumStrategy
 from answerer import RelevancySortingStrategy
 from evaluate import EvaluateStrategy
+from qbc import QueryByCommitteeWeighted, QueryByCommitteeKOTH
 import gensim
 import dill as pickle
+
+strategy_classes = ['BaselineRandomStrategy', 'NaiveStrategy', 
+                    'KeywordEqualWeightStrategy', 'KeywordConfidenceStrategy', 
+                    'TopicWeightedKeywordSumStrategy', 'TopicWeightedNaiveSumStrategy']
 
 DATA_SET_PICKLE_FILE = '../sharedObjects/data_set_with_question_stats_11_1_15.p'
 
@@ -15,10 +20,31 @@ def main(argv):
 
   w2v_dims = argv[0]
   if w2v_dims in ['50', '100', '200', '300']:
+    print "Loading w2v model..."
     model = gensim.models.Word2Vec.load_word2vec_format("../data/glove.6B." + w2v_dims + "d.txt")
   else:
     print "Incorrect number of dimensions specified for word2vec model."
     return
+
+  print "Creating qbc classes..."
+  kingOfTheHill = QueryByCommitteeKOTH(strategy_classes, data_set_obj, model)
+  ave = QueryByCommitteeWeighted(strategy_classes, data_set_obj, model)
+
+  print "Training qbc objects..."
+  kingOfTheHill.train(data_set_obj)
+  ave.train(data_set_obj)
+
+  print "Creating and running evaluation metrics of qbc classes..."
+  evaluateKingOfTheHill = EvaluateStrategy(kingOfTheHill)
+  evaluateKingOfTheHill.run_evaluation(data_set_obj)
+  evaluateKingOfTheHill.print_stats()
+
+  evaluateAve = EvaluateStrategy(ave)
+  evaluateAve.run_evaluation(data_set_obj)
+  evaluateAve.print_stats()
+
+
+
 
   # baselineA = BaselineStrategy(data_set_obj, model, 'A')
   # baselineB = BaselineStrategy(data_set_obj, model, 'B')
@@ -35,17 +61,32 @@ def main(argv):
   #evaluateKeywordsConfidence = EvaluateStrategy(topicKeywordSum)
   #evaluateKeywordsConfidence.run_evaluation()
 
-  # print "Baseline A Strategy:", str(baselineA.run())
-  # print "Baseline B Strategy:", str(baselineB.run())
-  # print "Baseline C Strategy:", str(baselineC.run())
-  # print "Baseline D Strategy:", str(baselineD.run())
-  # print "Baseline Random Strategy:", str(baselineRand.run())
-  # print "Naive Strategy:", str(naive.run())
-  # print "Keyword Equal Strategy:", str(keywordsEqual.run())
-  # print "Keyword Confidence Strategy:", str(keywordsConfidence.run())
-  # print "Topic Weight Keyword Strategy:", str(topicKeywordSum.run())
-  # print "Topic Weight Naive Strategy:", str(topicNaiveSum.run())
-  print "Relevancy Strategy:", str(relevancySorting.run())
+  # The below code creates evalutation classes to run the strategies
+  # and print the appropriate stats
+
+  # evaluateNaive = EvaluateStrategy(naive)
+  # evaluateNaive.run_evaluation()
+  # evaluateNaive.print_stats()
+
+  # evaluateKeywordsEqual = EvaluateStrategy(keywordsEqual)
+  # evaluateKeywordsEqual.run_evaluation()
+  # evaluateKeywordsEqual.print_stats()
+
+  # evaluateKeywordsConfidence = EvaluateStrategy(keywordsConfidence)
+  # evaluateKeywordsConfidence.run_evaluation()
+  # evaluateKeywordsConfidence.print_stats()
+
+  # evaluateTopicKeywordSum = EvaluateStrategy(topicKeywordSum)
+  # evaluateTopicKeywordSum.run_evaluation()
+  # evaluateTopicKeywordSum.print_stats()
+
+  # evaluateTopicNaiveSum = EvaluateStrategy(topicNaiveSum)
+  # evaluateTopicNaiveSum.run_evaluation()
+  # evaluateTopicNaiveSum.print_stats()
+
+  evaluateRelevancySorting = EvaluateStrategy(relevancySorting)
+  evaluateRelevancySorting.run_evaluation()
+  evaluateRelevancySorting.print_stats()
 
 
 if __name__ == '__main__':
