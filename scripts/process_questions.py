@@ -1,6 +1,7 @@
 import sys
 from answerer import BaselineStrategy, BaselineRandomStrategy, NaiveStrategy, KeywordEqualWeightStrategy
 from answerer import KeywordConfidenceStrategy, TopicWeightedKeywordSumStrategy, TopicWeightedNaiveSumStrategy
+from answerer import RelevancySortingStrategy
 from evaluate import EvaluateStrategy
 import gensim
 import dill as pickle
@@ -27,11 +28,12 @@ def main(argv):
   # naive = NaiveStrategy(data_set_obj, model)
   # keywordsEqual = KeywordEqualWeightStrategy(data_set_obj, model)
   # keywordsConfidence = KeywordConfidenceStrategy(data_set_obj, model)
-  topicKeywordSum = TopicWeightedKeywordSumStrategy(data_set_obj, model)
+  #topicKeywordSum = TopicWeightedKeywordSumStrategy(data_set_obj, model)
   # topicNaiveSum = TopicWeightedNaiveSumStrategy(data_set_obj, model)
+  relevancySorting = RelevancySortingStrategy(data_set_obj, model)
 
-  evaluateKeywordsConfidence = EvaluateStrategy(topicKeywordSum)
-  evaluateKeywordsConfidence.run_evaluation()
+  #evaluateKeywordsConfidence = EvaluateStrategy(topicKeywordSum)
+  #evaluateKeywordsConfidence.run_evaluation()
 
   # print "Baseline A Strategy:", str(baselineA.run())
   # print "Baseline B Strategy:", str(baselineB.run())
@@ -43,6 +45,7 @@ def main(argv):
   # print "Keyword Confidence Strategy:", str(keywordsConfidence.run())
   # print "Topic Weight Keyword Strategy:", str(topicKeywordSum.run())
   # print "Topic Weight Naive Strategy:", str(topicNaiveSum.run())
+  print "Relevancy Strategy:", str(relevancySorting.run())
 
 
 if __name__ == '__main__':
