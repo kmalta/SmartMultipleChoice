@@ -9,13 +9,14 @@ class EvaluateStrategy(object):
     self.strategy = strategy
     self.data_set_len = len(self.strategy.data_set_obj.questions_list)
 
-  def run_evaluation(self):
+  def run_evaluation(self, data_set_obj = None):
 
-    for question in self.strategy.data_set_obj.questions_list:
+    if data_set_obj == None:
+      data_set_obj = self.strategy.data_set_obj
+    for question in data_set_obj.questions_list:
       question.prediction = self.strategy.answer(question)
 
     self.run_stats()
-    self.print_stats()
 
   def run_stats(self):
     correct = 0
@@ -105,6 +106,8 @@ class EvaluateStrategy(object):
     print "############################################ STRATEGY RESULTS ############################################"
     print "##########################################################################################################"
     print "\n\n"
+    print "Class:", str(type(self.strategy).__name__)
+    print "\n"
     print "total/number correct/number incorrect:", str(self.data_set_len), str(self.correct), str(self.incorrect)
     print "number of each type (question, statement, answer_finisher):", str(self.question_types), str(self.statement_types), str(self.answer_finisher_types)
     print "\n"
