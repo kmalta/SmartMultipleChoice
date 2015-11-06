@@ -4,13 +4,19 @@ sys.path.append('./')
 import answerer
 from answerer import AnswerStrategy, BaselineStrategy, BaselineRandomStrategy, NaiveStrategy, KeywordEqualWeightStrategy
 from answerer import KeywordConfidenceStrategy, TopicWeightedKeywordSumStrategy, TopicWeightedNaiveSumStrategy
+from answerer import Doc2VecStrategy, RelevancySortingStrategy
 from evaluate import EvaluateStrategy
 
+strategy_classes = [
+'NaiveStrategy',
+#'Doc2VecStrategy',
+'KeywordEqualWeightStrategy',
+'KeywordConfidenceStrategy',
+'TopicWeightedKeywordSumStrategy',
+'TopicWeightedNaiveSumStrategy',
+'RelevancySortingStrategy',
+]
 
-
-strategy_classes = ['BaselineRandomStrategy', 'NaiveStrategy', 
-                    'KeywordEqualWeightStrategy', 'KeywordConfidenceStrategy', 
-                    'TopicWeightedKeywordSumStrategy', 'TopicWeightedNaiveSumStrategy']
 
 class QueryByCommitteeKOTH(AnswerStrategy):
 

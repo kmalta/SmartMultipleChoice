@@ -1,19 +1,62 @@
 import sys
+import answerer
 from answerer import BaselineStrategy, BaselineRandomStrategy, NaiveStrategy, KeywordEqualWeightStrategy
 from answerer import KeywordConfidenceStrategy, TopicWeightedKeywordSumStrategy, TopicWeightedNaiveSumStrategy
-from answerer import RelevancySortingStrategy
+from answerer import Doc2VecStrategy, RelevancySortingStrategy
 from evaluate import EvaluateStrategy
 from qbc import QueryByCommitteeWeighted, QueryByCommitteeKOTH
 import gensim
 import dill as pickle
 
-strategy_classes = ['BaselineRandomStrategy', 'NaiveStrategy', 
-                    'KeywordEqualWeightStrategy', 'KeywordConfidenceStrategy', 
-                    'TopicWeightedKeywordSumStrategy', 'TopicWeightedNaiveSumStrategy']
+#GLOBALS
+
+strategy_classes = [
+# 'NaiveStrategy',
+# #'Doc2VecStrategy',
+# 'KeywordEqualWeightStrategy',
+# 'KeywordConfidenceStrategy',
+# 'TopicWeightedKeywordSumStrategy',
+# 'TopicWeightedNaiveSumStrategy',
+'RelevancySortingStrategy',
+]
+
+qbc_classes = [
+'QueryByCommitteeWeighted',
+'QueryByCommitteeKOTH'
+]
 
 DATA_SET_PICKLE_FILE = '../sharedObjects/data_set_with_question_stats_11_1_15.p'
 
+
+
+
 def main(argv):
+  data_set_obj, model = main_loading(argv)
+  if data_set_obj == 0:
+    return
+  run_strategies(data_set_obj, model)
+  # run_qbc_strategies(data_set_obj, model)
+
+
+def run_strategies(data_set_obj, model):
+  for strategy in strategy_classes:
+    print "Running Strategy for class:", strategy
+    strat_class = getattr(answerer, strategy)
+    obj = strat_class(data_set_obj, model)
+    eval_obj = EvaluateStrategy(obj)
+    eval_obj.run_evaluation()
+    eval_obj.print_stats()
+
+def run_qbc_strategies(data_set_obj, model):
+  for strategy in qbc_classes:
+    print "Running Query by Committee for class:", strategy
+    qbc_class = getattr(answerer, strategy)
+    obj = qbc_class(strategy_classes, data_set_obj, model)
+    eval_obj = EvaluateStrategy(obj)
+    eval_obj.run_evaluation()
+    eval_obj.print_stats()
+
+def main_loading(argv):
   f = open(DATA_SET_PICKLE_FILE, 'r')
   data_set_obj = pickle.load(f)
   f.close()
@@ -24,70 +67,8 @@ def main(argv):
     model = gensim.models.Word2Vec.load_word2vec_format("../data/glove.6B." + w2v_dims + "d.txt")
   else:
     print "Incorrect number of dimensions specified for word2vec model."
-    return
-
-  print "Creating qbc classes..."
-  kingOfTheHill = QueryByCommitteeKOTH(strategy_classes, data_set_obj, model)
-  ave = QueryByCommitteeWeighted(strategy_classes, data_set_obj, model)
-
-  print "Training qbc objects..."
-  kingOfTheHill.train(data_set_obj)
-  ave.train(data_set_obj)
-
-  print "Creating and running evaluation metrics of qbc classes..."
-  evaluateKingOfTheHill = EvaluateStrategy(kingOfTheHill)
-  evaluateKingOfTheHill.run_evaluation(data_set_obj)
-  evaluateKingOfTheHill.print_stats()
-
-  evaluateAve = EvaluateStrategy(ave)
-  evaluateAve.run_evaluation(data_set_obj)
-  evaluateAve.print_stats()
-
-
-
-
-  # baselineA = BaselineStrategy(data_set_obj, model, 'A')
-  # baselineB = BaselineStrategy(data_set_obj, model, 'B')
-  # baselineC = BaselineStrategy(data_set_obj, model, 'C')
-  # baselineD = BaselineStrategy(data_set_obj, model, 'D')
-  # baselineRand = BaselineRandomStrategy(data_set_obj, model)
-  # naive = NaiveStrategy(data_set_obj, model)
-  # keywordsEqual = KeywordEqualWeightStrategy(data_set_obj, model)
-  # keywordsConfidence = KeywordConfidenceStrategy(data_set_obj, model)
-  #topicKeywordSum = TopicWeightedKeywordSumStrategy(data_set_obj, model)
-  # topicNaiveSum = TopicWeightedNaiveSumStrategy(data_set_obj, model)
-  relevancySorting = RelevancySortingStrategy(data_set_obj, model)
-
-  #evaluateKeywordsConfidence = EvaluateStrategy(topicKeywordSum)
-  #evaluateKeywordsConfidence.run_evaluation()
-
-  # The below code creates evalutation classes to run the strategies
-  # and print the appropriate stats
-
-  # evaluateNaive = EvaluateStrategy(naive)
-  # evaluateNaive.run_evaluation()
-  # evaluateNaive.print_stats()
-
-  # evaluateKeywordsEqual = EvaluateStrategy(keywordsEqual)
-  # evaluateKeywordsEqual.run_evaluation()
-  # evaluateKeywordsEqual.print_stats()
-
-  # evaluateKeywordsConfidence = EvaluateStrategy(keywordsConfidence)
-  # evaluateKeywordsConfidence.run_evaluation()
-  # evaluateKeywordsConfidence.print_stats()
-
-  # evaluateTopicKeywordSum = EvaluateStrategy(topicKeywordSum)
-  # evaluateTopicKeywordSum.run_evaluation()
-  # evaluateTopicKeywordSum.print_stats()
-
-  # evaluateTopicNaiveSum = EvaluateStrategy(topicNaiveSum)
-  # evaluateTopicNaiveSum.run_evaluation()
-  # evaluateTopicNaiveSum.print_stats()
-
-  evaluateRelevancySorting = EvaluateStrategy(relevancySorting)
-  evaluateRelevancySorting.run_evaluation()
-  evaluateRelevancySorting.print_stats()
-
+    return [0,0]
+  return data_set_obj, model
 
 if __name__ == '__main__':
   main(sys.argv[1:])
