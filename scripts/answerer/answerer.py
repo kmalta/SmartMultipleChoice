@@ -1,5 +1,5 @@
 import gensim
-from scipy.spatial.distance import cosine
+from scipy.spatial.distance import cosine, euclidean
 import numpy as np
 import random
 
@@ -76,6 +76,8 @@ class Doc2VecStrategy(AnswerStrategy):
     options = [question_class.answer_a, question_class.answer_b, question_class.answer_c, question_class.answer_d]
     cos = np.array([cosine(q_vec, self.model.infer_vector(self._tokenize(x.text))) for x in options])
     return ['A', 'B', 'C', 'D'][cos.argmin()]
+    # eu = np.array([euclidean(q_vec, self.model.infer_vector(self._tokenize(x.text))) for x in options])
+    # return ['A', 'B', 'C', 'D'][eu.argmin()]
 
   def _tokenize(self, text):
     return " ".join(gensim.utils.tokenize(text, lower=True))

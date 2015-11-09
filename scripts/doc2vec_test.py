@@ -1,6 +1,6 @@
 __author__ = 'angad'
 
-from scripts.answerer import Doc2VecStrategy
+from answerer import Doc2VecStrategy
 import gensim
 import dill as pickle
 
