@@ -1,10 +1,6 @@
 import sys
 import answerer
-from answerer import BaselineStrategy, BaselineRandomStrategy, NaiveStrategy, KeywordEqualWeightStrategy
-from answerer import KeywordConfidenceStrategy, TopicWeightedKeywordSumStrategy, TopicWeightedNaiveSumStrategy
-from answerer import Doc2VecStrategy, RelevancySortingStrategy
 from evaluate import EvaluateStrategy
-from qbc import QueryByCommitteeWeighted, QueryByCommitteeKOTH
 import gensim
 import dill as pickle
 
@@ -26,8 +22,6 @@ qbc_classes = [
 ]
 
 DATA_SET_PICKLE_FILE = '../sharedObjects/data_set_with_question_stats_11_1_15.p'
-
-
 
 
 def main(argv):
