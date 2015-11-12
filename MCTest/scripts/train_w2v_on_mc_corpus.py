@@ -42,9 +42,15 @@ def train_w2v_model(corpus_name, model_name):
     f = open('../sharedObjects/' + corpus_name, 'r')
     corpus = f.readlines()
     f.close()
-    model = Word2Vec(corpus, workers = 4,
+    processed_corpus = []
+    for sentence in corpus:
+        sentence = sentence.replace('\n', '').split()
+        sentence = filter(lambda x: x != ' ', sentence)
+        if len(sentence) != 0:
+            processed_corpus.append(sentence)
+    model = Word2Vec(processed_corpus, workers = 4,
                 size = 300, min_count = 2,
-                window = 30, sample = 1e-5)
+                window = 30)
 
     model.init_sims(replace=True)
     save_model(model, model_name)
