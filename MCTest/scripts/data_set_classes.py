@@ -23,7 +23,7 @@ class QuestionClass(object):
 
     def parse_raw_questions(self, q_array):
 
-        self.num_sents_answer_location = q_array[0].split(':')[0]
+        self.one_or_multiple = q_array[0].split(':')[0]
         self.question = q_array[0].split(':')[1][1:]
         answers = []
         i = 0
@@ -34,7 +34,7 @@ class QuestionClass(object):
         self.answers = answers
 
     def print_dump(self):
-        print "Number of sentences to find answer: ", self.num_sents_answer_location
+        print "Number of sentences to find answer: ", self.one_or_multiple
         print "Question: ", self.question
         print "\nCorrect Answer: ", self.correct_answer, "\n"
         for answer in self.answers:
