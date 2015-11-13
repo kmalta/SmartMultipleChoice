@@ -159,16 +159,3 @@ def save_object(obj, name):
     pickle.dump(obj, f)
     f.close()
 
-
-
-# THIS RUNS THE DATASET
-
-# data_set_obj = DataSet('../dataSet/mc500.train.tsv', 'mc500train')
-# add_answers_to_data_set(data_set_obj, '../dataSet/mc500.train.ans')
-# save_object(data_set_obj, 'dataSet_mc500_train.p')
-
-
-
-# data_set_obj.print_dump()
-
-
