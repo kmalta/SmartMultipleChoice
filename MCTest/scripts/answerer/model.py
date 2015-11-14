@@ -35,8 +35,8 @@ class Model(object):
       pass
     else:
       predictions = self.predict(data_set)
-      keys = eval_dict.keys() if evaluations == 'all' else evaluations
-      evals = [eval_dict[key](data_set, predictions) for key in keys]
+      keys = model_eval_dict.keys() if evaluations == 'all' else evaluations
+      evals = [model_eval_dict[key](data_set, predictions) for key in keys]
       for _eval in evals:
         _eval.evaluate
       self.statistics = [(key, _eval.statistic) for _eval in evals]
@@ -84,7 +84,6 @@ class NaiveModel(Model):
     pass
 
 """
-
 
 class Word2VecSentencePair(WordVectorModel):
 
