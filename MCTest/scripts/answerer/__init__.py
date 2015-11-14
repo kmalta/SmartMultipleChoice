@@ -1,2 +1,2 @@
-from answerer import *
-from similarity_matrix import *
+# from answerer import *
+# from similarity_matrix import *
