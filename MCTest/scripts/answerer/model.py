@@ -27,7 +27,7 @@ class Model(object):
     else:
       predictions = self.predict(data_set)
       keys = eval_dict.keys() if evaluations == 'all' else evaluations
-      evals = [eval_dict[key][0](data_set, predictions, eval_dict[key][1]) for key in keys]
+      evals = [eval_dict[key](data_set, predictions) for key in keys]
       for _eval in evals:
         _eval.evaluate
       self.statistics = [(key, _eval.statistic) for _eval in evals]
