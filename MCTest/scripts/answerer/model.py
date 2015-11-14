@@ -4,7 +4,8 @@ from itertools import permutations
 import traceback
 import numpy as np
 import random
-from evalutations import *
+
+from evaluation import *
 
 class Model(object):
 
@@ -32,11 +33,6 @@ class Model(object):
       for _eval in evals:
         _eval.evaluate
       self.statistics = [(key, _eval.statistic) for _eval in evals]
-
-
-
-      else:
-
 
   def train(self, data_set):
     self.trained = 1

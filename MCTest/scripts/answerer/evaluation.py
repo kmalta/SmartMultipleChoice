@@ -1,16 +1,11 @@
 import matplotlib
 
-
-eval_dict = {'Accuracy': Accuracy,
-             'OneOrMultipleAccuracy': OneOrMultipleAccuracy,
-             'QualityScoreAccuracy': QualityScoreAccuracy}
-
 class EvaluationBase(object):
 
   def __init__(self, data_set, predictions):
     self.data_set = data_set
     self.predictions = predictions
-    __get_correct_answers()
+    self._get_correct_answers()
 
   def evaluate(self):
     pass
@@ -18,7 +13,7 @@ class EvaluationBase(object):
   def plot(self):
     pass
 
-  def __get_correct_answers(self):
+  def _get_correct_answers(self):
     correct_answers = []
     for story_and_question in self.data_set.story_question_list:
       correct_answers.append([question.correct_answer for question in story_and_question.questions_list])
@@ -43,7 +38,7 @@ class BucketAccuracy(EvaluationBase):
     pass
 
 
-class Accuracy(data_set, predictions):
+class Accuracy(BucketAccuracy):
 
   def __init__(self, data_set, predictions):
     BucketAccuracy.__init__(self, data_set, predictions)
@@ -65,7 +60,7 @@ class Accuracy(data_set, predictions):
     self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
 
 
-class OneOrMultipleAccuracy(data_set, predictions):
+class OneOrMultipleAccuracy(BucketAccuracy):
 
   def __init__(self, data_set, predictions):
     BucketAccuracy.__init__(self, data_set, predictions)
@@ -84,7 +79,7 @@ class OneOrMultipleAccuracy(data_set, predictions):
     self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
 
 
-class QualityScoreAccuracy(data_set, predictions):
+class QualityScoreAccuracy(BucketAccuracy):
 
   def __init__(self, data_set, predictions):
     BucketAccuracy.__init__(self, data_set, predictions)
@@ -102,6 +97,7 @@ class QualityScoreAccuracy(data_set, predictions):
     self.buckets = buckets
     self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
 
-
-
-
+# Define after the classes
+eval_dict = {'Accuracy': Accuracy,
+             'OneOrMultipleAccuracy': OneOrMultipleAccuracy,
+             'QualityScoreAccuracy': QualityScoreAccuracy}
