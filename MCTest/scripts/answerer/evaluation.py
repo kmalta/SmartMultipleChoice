@@ -27,14 +27,14 @@ class BucketAccuracy(EvaluationBase):
     EvaluationBase.__init__(self, data_set, predictions)
 
   def evaluate(self):
-    num_correct = [0 for i in range(0,len(self.buckets_list))]
+    num_correct = [0 for i in range(0,len(self.buckets))]
     for i in range(0, len(self.data_set.story_question_list)):
       for j in range(0,4):
         if self.predictions[i][j] == self.correct_answers[i][j]:
-          num_correct[self.buckets_list.index(self.bucketed_results[i][j])] += 1
-    self.statistic = [float(num_correct[i])/(self.bucket_totals[i]) for i in range(0, len(self.buckets_list))]
+          num_correct[self.buckets.index(self.bucketed_results[i][j])] += 1
+    self.statistic = [float(num_correct[i])/(self.bucket_totals[i]) for i in range(0, len(self.buckets))]
 
-  def __make_bucket_totals(self, buckets, bucketed_results):
+  def _make_bucket_totals(self, buckets, bucketed_results):
     self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
 
 
@@ -46,10 +46,11 @@ class Accuracy(BucketAccuracy):
 
   def __init__(self, data_set, predictions):
     BucketAccuracy.__init__(self, data_set, predictions)
-    self.__setup(data_set, predictions)
+    self._setup(data_set, predictions)
 
-  def __setup(self, data_set, predictions):
+  def _setup(self, data_set, predictions):
     buckets = [0,1]
+    print repr(predictions), repr(self.correct_answers)
     bucketed_results = []
     for i in range(0, len(data_set.story_question_list)):
         story_results = []
@@ -61,7 +62,7 @@ class Accuracy(BucketAccuracy):
         bucketed_results.append(story_results)
     self.bucketed_results = bucketed_results
     self.buckets = buckets
-    self.__make_bucket_totals(buckets, bucketed_results)
+    self._make_bucket_totals(buckets, bucketed_results)
 
 
 
@@ -69,9 +70,9 @@ class OneOrMultipleAccuracy(BucketAccuracy):
 
   def __init__(self, data_set, predictions):
     BucketAccuracy.__init__(self, data_set, predictions)
-    self.__setup(data_set, predictions)
+    self._setup(data_set, predictions)
 
-  def __setup(self, data_set, predictions):
+  def _setup(self, data_set, predictions):
     buckets = ['one', 'multiple']
     bucketed_results = []
     for i in range(0, len(data_set.story_question_list)):
@@ -81,15 +82,15 @@ class OneOrMultipleAccuracy(BucketAccuracy):
       bucketed_results.append(story_results)
     self.bucketed_results = bucketed_results
     self.buckets = buckets
-    self.__make_bucket_totals(buckets, bucketed_results)
+    self._make_bucket_totals(buckets, bucketed_results)
 
 class QualityScoreAccuracy(BucketAccuracy):
 
   def __init__(self, data_set, predictions):
     BucketAccuracy.__init__(self, data_set, predictions)
-    self.__setup(data_set, predictions)
+    self._setup(data_set, predictions)
 
-  def __setup(self, data_set, predictions):
+  def _setup(self, data_set, predictions):
     buckets = [80, 85, 90, 95, 100]
     bucketed_results = []
     for i in range(0, len(data_set.story_question_list)):
@@ -99,16 +100,16 @@ class QualityScoreAccuracy(BucketAccuracy):
       bucketed_results.append(story_results)
     self.bucketed_results = bucketed_results
     self.buckets = buckets
-    self.__make_bucket_totals(buckets, bucketed_results)
+    self._make_bucket_totals(buckets, bucketed_results)
 
-class EnsembleEvaluationBase(EvaluationBase):
-
-  def __init__(self, data_set, models):
-    EvaluationBase.__init__(self, data_set, predictions)
-    self.models = models
-
-  def evaluate(self):
-    
+# class EnsembleEvaluationBase(EvaluationBase):
+#
+#   def __init__(self, data_set, models):
+#     EvaluationBase.__init__(self, data_set, predictions)
+#     self.models = models
+#
+#   def evaluate(self):
+#
 
 # Define after the classes
 model_eval_dict = {'Accuracy': Accuracy,

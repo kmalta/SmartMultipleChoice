@@ -25,7 +25,7 @@ class Model(object):
     all_answers = []
     for story_question in data_set.story_question_list:
       all_answers += [self._answer(story_question)]
-      break
+      # break
     return all_answers
 
   def evaluate(self, data_set, evaluations = None):
@@ -40,7 +40,7 @@ class Model(object):
       keys = evaluation.model_eval_dict.keys() if evaluations == 'all' else evaluations
       evals = [evaluation.model_eval_dict[key](data_set, predictions) for key in keys]
       for _eval in evals:
-        _eval.evaluate
+        _eval.evaluate()
       self.statistics = [(key, _eval.statistic) for _eval in evals]
 
   def train(self, data_set):
