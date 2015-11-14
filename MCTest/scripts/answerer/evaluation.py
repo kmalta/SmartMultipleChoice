@@ -1,5 +1,10 @@
 import matplotlib
 
+
+eval_dict = {'accuracy': [BucketAccuracy, accuracy], 
+             'oneOrMultipleAccuracy': [BucketAccuracy, oneOrMultipleAccuracy],
+             'qualityScoreAccuracy': [BucketAccuracy, qualityScoreAccuracy]}
+
 class EvaluationBase(object):
 
   def __init__(self, data_set, predictions):
@@ -23,10 +28,9 @@ class EvaluationBase(object):
 
 class BucketAccuracy(EvaluationBase):
 
-  def __init__(self, data_set, predictions, func_handle, buckets_list):
+  def __init__(self, data_set, predictions, func_handle):
     EvaluationBase.__init__(self, data_set, predictions)
-    self.bucketed_results, self.bucket_totals = func_handle(data_set, predictions, self.correct_answers)
-    self.buckets_list = buckets_list
+    self.bucketed_results, self.buckets_list, self.bucket_totals = func_handle(data_set, predictions, self.correct_answers)
 
 
   def evaluate(self):
@@ -42,6 +46,7 @@ class BucketAccuracy(EvaluationBase):
 
 
 def accuracy(data_set, predictions, correct_answers):
+  buckets = [0,1]
   bucketed_results = []
   for i in range(0, len(data_set.story_question_list)):
       story_results = []
@@ -51,27 +56,32 @@ def accuracy(data_set, predictions, correct_answers):
         else:
           story_results.append(0)
       bucketed_results.append(story_results)
-  return bucketed_results, [0,1]
+  return bucketed_results, buckets, 
+  [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
 
 
 def oneOrMultipleAccuracy(data_set, predictions, correct_answers):
+  buckets = ['one', 'multiple']
   bucketed_results = []
   for i in range(0, len(data_set.story_question_list)):
     story_results = []
     for j in range(0,4):
       story_results.append(data_set.story_question_list[i].questions_list[j].one_or_multiple)
     bucketed_results.append(story_results)
-  return bucketed_results, ['one', 'multiple']
+  return bucketed_results, buckets,
+    [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
 
-def qualityScoreAccuracy(data_set):
+
+def qualityScoreAccuracy(data_set, predictions, correct_answers):
+  buckets = [80, 85, 90, 95, 100]
   bucketed_results = []
   for i in range(0, len(data_set.story_question_list)):
     story_results = []
     for j in range(0,4):
       story_results.append(data_set.story_question_list[i].story.quality_score)
     bucketed_results.append(story_results)
-  return bucketed_results, [80, 85, 90, 95, 100]
-
+  return bucketed_results, buckets,
+    [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
 
 
 
