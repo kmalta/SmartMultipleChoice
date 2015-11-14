@@ -20,37 +20,41 @@ class EvaluationBase(object):
 
     self.correct_answers = correct_answers
 
-class Accuracy(EvaluationBase):
 
-  def __init__(self, data_set, predictions):
+class BucketAccuracy(EvaluationBase):
+
+  def __init__(self, data_set, predictions, func_handle, buckets_list):
     EvaluationBase.__init__(self, data_set, predictions)
+    self.bucketed_results, self.bucket_totals = func_handle(data_set)
+    self.buckets_list = buckets_list
+
 
   def evaluate(self):
-    num_correct = 0
+    num_correct = [0 for i in range(0,len(self.buckets_list))]
     for i in range(0, len(self.data_set.story_question_list)):
       for j in range(0,4):
         if self.predictions[i][j] == self.correct_answers[i][j]:
-          num_correct += 1
-    self.statistic = float(num_correct)/(len(self.data_set.story_question_list) * 4)
+          num_correct[self.buckets_list.index(self.bucketed_results[i][j])] += 1
+    self.statistic = [float(num_correct[i])/(self.bucket_totals[i]) for i in range(0, len(self.buckets_list))]
 
   def plot(self):
     pass
 
 
-class OneVsMultipleAccuracy(EvaluationBase):
 
-  def __init__(self, data_set, predictions):
-    EvaluationBase.__init__(self, data_set, predictions)
-    __setup()
 
-  def evaluate(self):
+def accuracy(data_set):
+  pass
+  #return 2 things
 
-    pass
+def oneOrMultipleAccuracy(data_set):
+  pass
+  #return 2 things
 
-  def __setup(self):
-    one_or_multiple = []
-    for story_and_question in self.data_set.story_question_list:
-      one_or_multiple.append([question.one_or_multiple for question in story_and_question.questions_list])
+def qualityScoreAccuracy(data_set):
+  pass
+  #return 2 things
 
-    self.one_or_multiple = one_or_multiple
+
+
 
