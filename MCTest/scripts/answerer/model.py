@@ -16,6 +16,7 @@ class Model(object):
     pass
 
   def predict(self, data_set):
+    self.train(data_set)
     pass
 
   def evaluate(self, data_set, evaluations = None):
