@@ -34,6 +34,10 @@ class BucketAccuracy(EvaluationBase):
           num_correct[self.buckets_list.index(self.bucketed_results[i][j])] += 1
     self.statistic = [float(num_correct[i])/(self.bucket_totals[i]) for i in range(0, len(self.buckets_list))]
 
+  def __make_bucket_totals(self, buckets, bucketed_results):
+    self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
+
+
   def plot(self):
     pass
 
@@ -57,7 +61,8 @@ class Accuracy(BucketAccuracy):
         bucketed_results.append(story_results)
     self.bucketed_results = bucketed_results
     self.buckets = buckets
-    self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
+    self.__make_bucket_totals(buckets, bucketed_results)
+
 
 
 class OneOrMultipleAccuracy(BucketAccuracy):
@@ -76,8 +81,7 @@ class OneOrMultipleAccuracy(BucketAccuracy):
       bucketed_results.append(story_results)
     self.bucketed_results = bucketed_results
     self.buckets = buckets
-    self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
-
+    self.__make_bucket_totals(buckets, bucketed_results)
 
 class QualityScoreAccuracy(BucketAccuracy):
 
@@ -95,9 +99,18 @@ class QualityScoreAccuracy(BucketAccuracy):
       bucketed_results.append(story_results)
     self.bucketed_results = bucketed_results
     self.buckets = buckets
-    self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
+    self.__make_bucket_totals(buckets, bucketed_results)
+
+class EnsembleEvaluationBase(EvaluationBase):
+
+  def __init__(self, data_set, models):
+    EvaluationBase.__init__(self, data_set, predictions)
+    self.models = models
+
+  def evaluate(self):
+    
 
 # Define after the classes
-eval_dict = {'Accuracy': Accuracy,
-             'OneOrMultipleAccuracy': OneOrMultipleAccuracy,
-             'QualityScoreAccuracy': QualityScoreAccuracy}
+model_eval_dict = {'Accuracy': Accuracy,
+                   'OneOrMultipleAccuracy': OneOrMultipleAccuracy,
+                   'QualityScoreAccuracy': QualityScoreAccuracy}
