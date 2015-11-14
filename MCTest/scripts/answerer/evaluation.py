@@ -25,7 +25,7 @@ class BucketAccuracy(EvaluationBase):
 
   def __init__(self, data_set, predictions, func_handle, buckets_list):
     EvaluationBase.__init__(self, data_set, predictions)
-    self.bucketed_results, self.bucket_totals = func_handle(data_set)
+    self.bucketed_results, self.bucket_totals = func_handle(data_set, predictions, self.correct_answers)
     self.buckets_list = buckets_list
 
 
@@ -41,19 +41,36 @@ class BucketAccuracy(EvaluationBase):
     pass
 
 
+def accuracy(data_set, predictions, correct_answers):
+  bucketed_results = []
+  for i in range(0, len(data_set.story_question_list)):
+      story_results = []
+      for j in range(0,4):
+        if predictions[i][j] == correct_answers[i][j]:
+          story_results.append(1)
+        else:
+          story_results.append(0)
+      bucketed_results.append(story_results)
+  return bucketed_results, [0,1]
 
 
-def accuracy(data_set):
-  pass
-  #return 2 things
-
-def oneOrMultipleAccuracy(data_set):
-  pass
-  #return 2 things
+def oneOrMultipleAccuracy(data_set, predictions, correct_answers):
+  bucketed_results = []
+  for i in range(0, len(data_set.story_question_list)):
+    story_results = []
+    for j in range(0,4):
+      story_results.append(data_set.story_question_list[i].questions_list[j].one_or_multiple)
+    bucketed_results.append(story_results)
+  return bucketed_results, ['one', 'multiple']
 
 def qualityScoreAccuracy(data_set):
-  pass
-  #return 2 things
+  bucketed_results = []
+  for i in range(0, len(data_set.story_question_list)):
+    story_results = []
+    for j in range(0,4):
+      story_results.append(data_set.story_question_list[i].story.quality_score)
+    bucketed_results.append(story_results)
+  return bucketed_results, [80, 85, 90, 95, 100]
 
 
 
