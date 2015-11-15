@@ -36,6 +36,7 @@ class BucketAccuracy(EvaluationBase):
 
   def _make_bucket_totals(self, buckets, bucketed_results):
     self.bucket_totals = [len(filter(lambda x: x == z, [y for inner in bucketed_results for y in inner])) for z in buckets]
+    print self.bucket_totals
 
 
   def plot(self):
@@ -50,7 +51,6 @@ class Accuracy(BucketAccuracy):
 
   def _setup(self, data_set, predictions):
     buckets = [0,1]
-    print repr(predictions), repr(self.correct_answers)
     bucketed_results = []
     for i in range(0, len(data_set.story_question_list)):
         story_results = []
@@ -64,6 +64,8 @@ class Accuracy(BucketAccuracy):
     self.buckets = buckets
     self._make_bucket_totals(buckets, bucketed_results)
 
+  def evaluate(self):
+    self.statistic = float(self.bucket_totals[1])/(self.bucket_totals[0] + self.bucket_totals[1])
 
 
 class OneOrMultipleAccuracy(BucketAccuracy):
@@ -103,13 +105,13 @@ class QualityScoreAccuracy(BucketAccuracy):
     self._make_bucket_totals(buckets, bucketed_results)
 
 # class EnsembleEvaluationBase(EvaluationBase):
-#
+
 #   def __init__(self, data_set, models):
 #     EvaluationBase.__init__(self, data_set, predictions)
 #     self.models = models
-#
+
 #   def evaluate(self):
-#
+
 
 # Define after the classes
 model_eval_dict = {'Accuracy': Accuracy,

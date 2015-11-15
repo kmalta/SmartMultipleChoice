@@ -16,7 +16,7 @@ class WordPairContextWindowFrequency(Model):
     else:
       self._stop_words_from_file()
 
-  def answer(self, story_question):
+  def _answer(self, story_question):
     cleaned_story = self._cleaned_text_array(story_question.story.story)
     
     # Ex: [('one', (word_pair_list, word_pair_list, word_pair_list, word_pair_list))]
@@ -30,6 +30,7 @@ class WordPairContextWindowFrequency(Model):
       answers.append(frequencies.index(max(frequencies)))
     return [index_to_answer_map[index] for index in answers]
 
+
   def train(self, data_set):
     sent_counts = []
     for story_question in data_set.story_question_list:
@@ -39,6 +40,7 @@ class WordPairContextWindowFrequency(Model):
         sent_counts.append(len(filter(is_alpha, nltk.wordpunct_tokenize(sentence))))
 
     self.avg_sent_len = int(np.mean(sent_counts))
+    self.trained = True
 
   def _stop_words_from_file(self):
     try:

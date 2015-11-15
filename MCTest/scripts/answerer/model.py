@@ -2,12 +2,12 @@ import gensim
 from scipy.spatial.distance import cosine
 import numpy as np
 
-from MCTest.scripts.answerer import evaluation
+import evaluation
 
 class Model(object):
 
   def __init__(self, **kwargs):
-    self.trained = 0
+    self.trained = False
     self.stop_words = self._stop_words_from_file()
 
     pass
@@ -18,7 +18,7 @@ class Model(object):
 
   def predict(self, data_set):
     """Will call self._answer on all stories in data_set and return a list of answer lists.
-    output format: [['A', 'A', 'A', 'A'], ...., ['A', 'A', 'A', 'A']]"""
+    output format: [['A', 'A', 'A', 'A'], ..., ['A', 'A', 'A', 'A']]"""
     if not self.trained:
       print "Model not trained"
       return
@@ -41,16 +41,16 @@ class Model(object):
       evals = [evaluation.model_eval_dict[key](data_set, predictions) for key in keys]
       for _eval in evals:
         _eval.evaluate()
-      self.statistics = [(key, _eval.statistic) for _eval in evals]
+      self.statistics = [(keys[evals.index(_eval)], _eval.statistic) for _eval in evals]
 
   def train(self, data_set):
-    self.trained = 1
+    self.trained = True
     pass
 
   def _stop_words_from_file(self):
     """Reads the stop_words file and returns a list of stop_words"""
     try:
-      stop_words_file = open('MCTest/scripts/answerer/stop_words.txt', 'r')
+      stop_words_file = open('./stop_words.txt', 'r')
     except:
       print 'Could not open stop_words.txt, stop words not removed'
       return
@@ -102,7 +102,7 @@ class Word2VecSentencePair(WordVectorModel):
 
   def __init__(self, word2vec_model, **kwargs):
     WordVectorModel.__init__(self, word2vec_model, **kwargs)
-    self.trained = 1
+    self.trained = True
 
   def _answer(self, story_question):
     story_sentence_vectors = [self._vectorize_and_add(self._tokenize(x)) for x in story_question.story.story_sentences]
