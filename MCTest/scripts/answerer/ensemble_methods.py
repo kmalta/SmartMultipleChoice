@@ -1,46 +1,25 @@
 from model import Model
-from data_set_class import *
+import itertools
+from collections import namedtuple
 
 
 class EnsembleMethod(Model):
 
-  def __init__(self, models_for_ensemble, **kwargs):
-    Model.__init__(self, kwargs)
-    self.ensemble = models_for_ensemble
-    self.trained = 0
-
-  def evaluate(self):
-    if self.trained == 0:
-      "Models in ensemble not trained"
-      return
-
-  def kappa_diversity(self):
-    pass
-
-
+  def __init__(self, *args):
+    Model.__init__(self)
+    self.ensemble = [i for arg in args for i in arg]
 
 class EnsembleMax(EnsembleMethod):
 
-  def __init__(self, models_for_ensemble, **kwargs):
-    EnsembleMethod.__init__(self, models_for_ensemble, kwargs)
-    self.ensemble = models_for_ensemble
-
-  def _answer(self, story_and_question):
-    buckets = self._list_of_buckets()
-    question_attribute_list = self._get_attributes(story_and_quesiton)
-    answers = []
-    for i in range(0,4):
-      for j in range(0, len(question_attribute_list)):
+  def __init__(self, *args):
+    EnsembleMethod.__init__(self, args)
 
 
-
-
-  def _get_attributes(self, story_and_quesiton):
-    attribute_list = []
-    for question in story_and_question.questions_list:
-      attribute_list.append([self._get_quality(story_and_question(story)), 
-                             self._get_one_or_multiple(question)])
-    return attribute_list
+  def _get_attributes(self, data_set):
+    for saq in data_set.story_question_list:
+      for question in saq.questions_list:
+        question.attribute_tuple = (self._get_one_or_multiple(question),
+                                    self._get_quality(saq.story))
 
   def buckets(self):
     return [['one', 'multiple'], [80, 85, 90, 95, 100]]
@@ -51,24 +30,67 @@ class EnsembleMax(EnsembleMethod):
   def _get_one_or_multiple(self, question):
     return question.one_or_multiple
 
-  def predict(self, data_set):
-    if self.trained == 0:
-      self.train(data_set)
-    return [self.__answer(saq) for saq in data_set.story_and_question_list]
+  def _answer(self, story_and_question):
+    answers = []
+    for i in range(0,4):
+      answers.append(self.ensemble[self.answer_dict[story_and_question.questions_list[i].attribute_tuple]]._answer(story_and_question)[i])
+    return answers
 
-  def train(self, data_set):
-    for model in self.ensemble:
-      model.train(data_set)
-    self.trained = 1
-    self._partition_data_set(data_set)
-    self._create_answer_dict()
+
+  def _create_diversity_matrix(self, predictions):
+    self.diversity_matrix = []
+    flat_predictions = [[i for question_predictions in model_predictions for i in question_predictions] for model_predictions in predictions]
+    for i in range(0, len(self.ensemble)):
+      diversity_row = []
+      for j in range(0, len(self.ensemble)):
+        diversity_row.append(float(len(filter(lambda x: x[0] != x[1], zip(flat_predictions[i], flat_predictions[j]))))/len(flat_predictions[0]))
+      self.diversity_matrix.append(diversity_row)
 
 
   def _partition_data_set(self, data_set):
-    
-    predictions = self.predict(data_set)
-    keys = evaluation.model_eval_dict.keys() if evaluations == 'all' else evaluations
-    evals = [evaluation.model_eval_dict[key](data_set, predictions) for key in keys]
-    for _eval in evals:
-      _eval.evaluate()
-    self.statistics = [(keys[evals.index(_eval)], _eval.statistic) for _eval in evals]
+    self.partition_tuples = list(itertools.product(*self.buckets()))
+    self.partition_counts = dict((el,0) for el in self.partition_tuples)
+    for saq in data_set.story_question_list:
+      for q in saq.questions_list:
+        self.partition_counts[q.attribute_tuple] += 1
+
+  def _create_answer_dict(self, data_set):
+    predictions = [model.predict(data_set) for model in self.ensemble]
+    self._create_diversity_matrix(predictions)
+    self.correct_totals = []
+    for i in range(0, len(self.ensemble)):
+      correct = dict((el,0) for el in self.partition_tuples)
+      for j in range(0, len(data_set.story_question_list)):
+        for k in range(0, 4):
+          if predictions[i][j][k] == self.correct_answers[j][k]:
+            correct[data_set.story_question_list[j].questions_list[k].attribute_tuple] += 1
+      self.correct_totals.append(correct)
+    self.answer_dict = dict((tup, self._get_index_of_max(tup)) for tup in self.partition_tuples)
+
+  def _get_index_of_max(self, tup):
+    index = 0
+    _max = 0
+    for i in range(0, len(self.ensemble)):
+      if self.correct_totals[i][tup] > _max:
+        _max = self.correct_totals[i][tup]
+        index = i
+    return index
+
+  def _get_correct_answers(self, data_set):
+    correct_answers = []
+    for story_and_question in data_set.story_question_list:
+      correct_answers.append([question.correct_answer for question in story_and_question.questions_list])
+
+    self.correct_answers = correct_answers
+
+
+  def train(self, data_set):
+    for model in self.ensemble:
+      print model
+      model.train(data_set)
+    self._get_attributes(data_set)
+    self._get_correct_answers(data_set)
+    self._partition_data_set(data_set)
+    self._create_answer_dict(data_set)
+    self.trained = True
+

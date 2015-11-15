@@ -104,14 +104,6 @@ class QualityScoreAccuracy(BucketAccuracy):
     self.buckets = buckets
     self._make_bucket_totals(buckets, bucketed_results)
 
-# class EnsembleEvaluationBase(EvaluationBase):
-
-#   def __init__(self, data_set, models):
-#     EvaluationBase.__init__(self, data_set, predictions)
-#     self.models = models
-
-#   def evaluate(self):
-
 
 # Define after the classes
 model_eval_dict = {'Accuracy': Accuracy,
