@@ -28,6 +28,9 @@ class Model(object):
       # break
     return all_answers
 
+  def _process_data_set(self, data_set):
+    pass
+
   def evaluate(self, data_set, evaluations = None):
     """Sets self.statistics for all evalutions. Evaluations must be a list of evaluation names"""
     if not self.trained:
@@ -36,6 +39,7 @@ class Model(object):
     if evaluations == None:
       pass
     else:
+      self._process_data_set(data_set)
       predictions = self.predict(data_set)
       keys = evaluation.model_eval_dict.keys() if evaluations == 'all' else evaluations
       evals = [evaluation.model_eval_dict[key](data_set, predictions) for key in keys]

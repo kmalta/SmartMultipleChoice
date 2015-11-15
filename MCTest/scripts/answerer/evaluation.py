@@ -104,8 +104,46 @@ class QualityScoreAccuracy(BucketAccuracy):
     self.buckets = buckets
     self._make_bucket_totals(buckets, bucketed_results)
 
+class QuestionWordAccuracy(BucketAccuracy):
+
+  def __init__(self, data_set, predictions):
+    BucketAccuracy.__init__(self, data_set, predictions)
+    self._setup(data_set, predictions)
+
+  def _setup(self, data_set, predictions):
+    buckets = ['what', 'when', 'where', 'why', 'who', 'which', 'how', 'other']
+    bucketed_results = []
+    for i in range(0, len(data_set.story_question_list)):
+      story_results = []
+      for j in range(0,4):
+        story_results.append(data_set.story_question_list[i].questions_list[j].w_word)
+      bucketed_results.append(story_results)
+    self.bucketed_results = bucketed_results
+    self.buckets = buckets
+    self._make_bucket_totals(buckets, bucketed_results)
+
+class OneWordAnswersAccuracy(BucketAccuracy):
+
+  def __init__(self, data_set, predictions):
+    BucketAccuracy.__init__(self, data_set, predictions)
+    self._setup(data_set, predictions)
+
+  def _setup(self, data_set, predictions):
+    buckets = ['yes', 'no']
+    bucketed_results = []
+    for i in range(0, len(data_set.story_question_list)):
+      story_results = []
+      for j in range(0,4):
+        story_results.append(data_set.story_question_list[i].questions_list[j].one_word_answers)
+      bucketed_results.append(story_results)
+    self.bucketed_results = bucketed_results
+    self.buckets = buckets
+    self._make_bucket_totals(buckets, bucketed_results)
+
 
 # Define after the classes
 model_eval_dict = {'Accuracy': Accuracy,
                    'OneOrMultipleAccuracy': OneOrMultipleAccuracy,
-                   'QualityScoreAccuracy': QualityScoreAccuracy}
+                   'QualityScoreAccuracy': QualityScoreAccuracy,
+                   'QuestionWordAccuracy': QuestionWordAccuracy,
+                   'OneWordAnswersAccuracy': OneWordAnswersAccuracy}

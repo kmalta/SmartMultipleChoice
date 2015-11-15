@@ -25,6 +25,7 @@ class QuestionClass(object):
 
         self.one_or_multiple = q_array[0].split(':')[0]
         self.question = q_array[0].split(':')[1][1:]
+        self._get_w_word()
         answers = []
         i = 0
         letters = ['A', 'B', 'C', 'D']
@@ -32,6 +33,23 @@ class QuestionClass(object):
             answers.append(AnswerClass(token, letters[i]))
             i += 1
         self.answers = answers
+        self._one_word_answers()
+
+    def _get_w_word(self):
+        for word in ['what', 'when', 'where', 'why', 'who', 'which', 'how']:
+            if word in map(lambda x: x.lower(), self.question.split()):
+                self.w_word = word
+                return
+        self.w_word = 'other'
+
+    def _one_word_answers(self):
+        _sum = 0
+        for answer in self.answers:
+            _sum += len(answer.answer.split())
+        if float(_sum)/4 < 2:
+            self.one_word_answers = 'yes'
+        else:
+            self.one_word_answers = 'no'
 
     def print_dump(self):
         print "Number of sentences to find answer: ", self.one_or_multiple
@@ -159,3 +177,12 @@ def save_object(obj, name):
     pickle.dump(obj, f)
     f.close()
 
+def create_data_set(set_type):
+    data_set_obj = DataSet('../dataSet/mc500.' + set_type + '.tsv', 'mc500' + set_type)
+    if set_type != 'test':
+        add_answers_to_data_set(data_set_obj, '../dataSet/mc500.' + set_type + '.ans')
+    save_object(data_set_obj, 'dataSet_mc500_' + set_type + '.p')
+
+def create_all_sets():
+    for set_type in ['train', 'dev', 'test']:
+        create_data_set(set_type)

@@ -19,16 +19,27 @@ class EnsembleMax(EnsembleMethod):
     for saq in data_set.story_question_list:
       for question in saq.questions_list:
         question.attribute_tuple = (self._get_one_or_multiple(question),
-                                    self._get_quality(saq.story))
+                                    self._get_quality(saq.story),
+                                    self._get_w_word(question),
+                                    self._get_one_word_answers(question))
 
   def buckets(self):
-    return [['one', 'multiple'], [80, 85, 90, 95, 100]]
+    return [['one', 'multiple'],
+            [80, 85, 90, 95, 100],
+            ['what', 'when', 'where', 'why', 'who', 'which', 'how', 'other'],
+            ['yes', 'no']]
 
   def _get_quality(self, story):
     return story.quality_score
 
   def _get_one_or_multiple(self, question):
     return question.one_or_multiple
+
+  def _get_w_word(self, question):
+    return question.w_word
+
+  def _get_one_word_answers(self, question):
+    return question.one_word_answers
 
   def _answer(self, story_and_question):
     answers = []
@@ -84,9 +95,12 @@ class EnsembleMax(EnsembleMethod):
     self.correct_answers = correct_answers
 
 
+  def _process_data_set(self, data_set):
+    self._get_attributes(data_set)
+    self._partition_data_set(data_set)
+
   def train(self, data_set):
     for model in self.ensemble:
-      print model
       model.train(data_set)
     self._get_attributes(data_set)
     self._get_correct_answers(data_set)
