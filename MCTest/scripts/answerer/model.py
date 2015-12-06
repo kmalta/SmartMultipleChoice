@@ -1,6 +1,9 @@
 import gensim
-from scipy.spatial.distance import cosine
+from gensim.models import Doc2Vec
+from gensim.models.doc2vec import TaggedLineDocument
+
 import numpy as np
+from scipy.spatial.distance import cosine
 
 import evaluation
 
@@ -54,7 +57,8 @@ class Model(object):
   def _stop_words_from_file(self):
     """Reads the stop_words file and returns a list of stop_words"""
     try:
-      stop_words_file = open('./stop_words.txt', 'r')
+      # stop_words_file = open('./stop_words.txt', 'r')
+      stop_words_file = open('MCTest/scripts/answerer/stop_words.txt', 'r')
     except:
       print 'Could not open stop_words.txt, stop words not removed'
       return
@@ -121,4 +125,35 @@ class Word2VecSentencePair(WordVectorModel):
           answer_cosines += [cosine(story_sentence_vector, question_answer_vector)]
         answer_min_cosines += [min(answer_cosines)]
       answers += [['A', 'B', 'C', 'D'][np.array(answer_min_cosines).argmin()]]
+    return answers
+
+
+class Doc2VecSentencePair(WordVectorModel):
+
+  def __init__(self):
+    WordVectorModel.__init__(self, None)
+    self.trained = True
+
+  def _answer(self, story_question):
+    sentences = story_question.story.story_sentences
+    with open('test.txt', 'w') as f:
+        f.writelines([self._tokenize(line) + '\n' for line in sentences])
+
+    doc = TaggedLineDocument('test.txt')
+    model = Doc2Vec(documents=doc, size=100, window=8, min_count=1, workers=4)
+
+    story_sentence_vectors = [model.infer_vector(x) for x in story_question.story.story_sentences]
+    answers = []
+    for question in story_question.questions_list:
+        answer_min_cosines = []
+        for answer in question.answers:
+            question_answer = self._tokenize(question.question + ' ' + answer.answer)
+            question_answer_vector = model.infer_vector(question_answer)
+            answer_cosines = []
+            for story_sentence_vector in story_sentence_vectors:
+                answer_cosines += [cosine(story_sentence_vector, question_answer_vector)]
+            answer_min_cosines += [min(answer_cosines)]
+        answers += [['A', 'B', 'C', 'D'][np.array(answer_min_cosines).argmin()]]
+
+    answers
     return answers
