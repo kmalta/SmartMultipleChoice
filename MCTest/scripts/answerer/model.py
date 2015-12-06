@@ -4,6 +4,7 @@ from gensim.models.doc2vec import TaggedLineDocument
 
 import numpy as np
 from scipy.spatial.distance import cosine
+import multiprocessing
 
 import evaluation
 
@@ -136,11 +137,12 @@ class Doc2VecSentencePair(WordVectorModel):
 
   def _answer(self, story_question):
     sentences = story_question.story.story_sentences
+
+    # TODO: How do we convert sentences to TaggedLineDocument without saving it as a file?
     with open('test.txt', 'w') as f:
         f.writelines([self._tokenize(line) + '\n' for line in sentences])
-
     doc = TaggedLineDocument('test.txt')
-    model = Doc2Vec(documents=doc, size=100, window=8, min_count=1, workers=4)
+    model = Doc2Vec(documents=doc, size=100, window=8, min_count=1, workers=multiprocessing.cpu_count())
 
     story_sentence_vectors = [model.infer_vector(x) for x in story_question.story.story_sentences]
     answers = []
@@ -155,5 +157,4 @@ class Doc2VecSentencePair(WordVectorModel):
             answer_min_cosines += [min(answer_cosines)]
         answers += [['A', 'B', 'C', 'D'][np.array(answer_min_cosines).argmin()]]
 
-    answers
     return answers
